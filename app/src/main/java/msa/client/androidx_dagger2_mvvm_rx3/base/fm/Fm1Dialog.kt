@@ -18,6 +18,9 @@ import androidx.navigation.fragment.findNavController
 import com.evernote.android.state.State
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.reactivex.disposables.CompositeDisposable
+import msa.client.androidx_dagger2_mvvm_rx3.base.ext.getClassTag
+import net.samystudio.beaver.ui.base.activity.At1LifeCycle
+
 /*
 import net.samystudio.beaver.ext.getClassTag
 import net.samystudio.beaver.ui.base.activity.BaseActivity
@@ -108,7 +111,7 @@ abstract class Fm1Dialog : AppCompatDialogFragment(), DialogInterface.OnShowList
     override fun onResume() {
         super.onResume()
         pauseDisposable = CompositeDisposable()
-/*
+
         if (!restoringState) {
             firebaseAnalytics.setCurrentScreen(
                 activity!!,
@@ -117,7 +120,7 @@ abstract class Fm1Dialog : AppCompatDialogFragment(), DialogInterface.OnShowList
             )
             restoringState = false
         }
-        */
+
     }
 
     override fun onPause() {
@@ -205,11 +208,11 @@ abstract class Fm1Dialog : AppCompatDialogFragment(), DialogInterface.OnShowList
         else {
             if (!showsDialog) navController.popBackStack()
 
-            /*(activity as? BaseActivity<*>)?.onActivityResult(
+            (activity as? At1LifeCycle<*>)?.onActivityResult(
                 targetRequestCode,
                 resultCode,
                 resultIntent
-            )*/
+            )
             targetFragment?.onActivityResult(targetRequestCode, resultCode, resultIntent)
 
             finished = true

@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.CallSuper
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import msa.client.androidx_dagger2_mvvm_rx3.base.vm.VmForFm
 
 /*
@@ -35,22 +37,24 @@ abstract class Fm3LifeCycle<VM : VmForFm> : Fm2Dagger(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-/*
-        viewModel = viewModelProvider.get(viewModelClass)
+
+        //viewModel = viewModelProvider.get(viewModelClass)
+        viewModel = ViewModelProviders.of(this).get(viewModelClass);
+
         viewModel.handleCreate()
         activity?.intent?.let { viewModel.handleIntent(it) }
         arguments?.let { viewModel.handleArguments(it) }
-        */
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-/*
+
         viewModel.navigationCommand.observe(
             viewLifecycleOwner,
             Observer { request ->
                 request?.let {
-                    navController.navigate(it, activity, fragmentManager)
+                    //navController.navigate(it, activity, fragmentManager)
                 }
             })
 
@@ -61,35 +65,35 @@ abstract class Fm3LifeCycle<VM : VmForFm> : Fm2Dagger(),
                     finish()
             }
         })
-        */
+
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
 
-//        savedInstanceState?.let { viewModel.handleRestoreInstanceState(it) }
+        savedInstanceState?.let { viewModel.handleRestoreInstanceState(it) }
     }
 
     override fun onNewIntent(intent: Intent) {
-//        viewModel.handleIntent(intent)
+        viewModel.handleIntent(intent)
 
         super.onNewIntent(intent)
     }
 
     @CallSuper
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        //      viewModel.handleResult(requestCode, resultCode, data)
+              viewModel.handleResult(requestCode, resultCode, data)
     }
 
     override fun onResume() {
         super.onResume()
 
-        //viewModel.handleReady()
+        viewModel.handleReady()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        //viewModel.handleSaveInstanceState(outState)
+        viewModel.handleSaveInstanceState(outState)
     }
 }

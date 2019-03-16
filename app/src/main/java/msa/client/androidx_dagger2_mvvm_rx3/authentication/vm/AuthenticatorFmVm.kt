@@ -3,9 +3,11 @@ package msa.client.androidx_dagger2_mvvm_rx3.authentication.vm
 import android.accounts.AccountAuthenticatorResponse
 import android.content.Intent
 import androidx.lifecycle.LiveData
-import msa.client.androidx_dagger2_mvvm_rx3.base.vm.AsyncStateLiveData
+import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncStateLiveData
 import msa.client.androidx_dagger2_mvvm_rx3.base.vm.VmForFm
 import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncState
+import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncStateLiveDataDefine
+
 /*
 import net.samystudio.beaver.data.AsyncState
 import net.samystudio.beaver.data.manager.AuthenticatorRepositoryManager
@@ -24,7 +26,8 @@ class AuthenticatorFmVm// @Inject constructor(private val authenticatorRepositor
     :VmForFm(), AsyncStateLiveDataDefine
     {
     //private val _dataPushCompletable: AsyncStateLiveData = AsyncStateLiveData()
-    override val liveData: LiveData<AsyncState> = AsyncStateLiveData()//_dataPushCompletable
+    override val liveData: LiveData<AsyncState> =
+        AsyncStateLiveData()//_dataPushCompletable
     //private val _signInVisibility: MutableLiveData<Boolean> = MutableLiveData()
     //private val _signUpVisibility: MutableLiveData<Boolean> = MutableLiveData()
     //val signInVisibility: LiveData<Boolean> = _signInVisibility
@@ -72,7 +75,7 @@ class AuthenticatorFmVm// @Inject constructor(private val authenticatorRepositor
                 }
             }
         }.subscribe())
-    }*/
+    }
 
     private fun handleSignResult(email: String, password: String) {
         /*authenticatorResponse?.onResult(
@@ -86,7 +89,7 @@ class AuthenticatorFmVm// @Inject constructor(private val authenticatorRepositor
         authenticatorResponse = null
         navigate(NavigationRequest.Pop())*/
     }
-
+*/
     /*override fun onCleared() {
         super.onCleared()
 

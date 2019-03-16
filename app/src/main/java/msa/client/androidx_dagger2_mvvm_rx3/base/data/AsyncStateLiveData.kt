@@ -1,4 +1,4 @@
-package msa.client.androidx_dagger2_mvvm_rx3.base.vm
+package msa.client.androidx_dagger2_mvvm_rx3.base.data
 
 import androidx.lifecycle.LiveData
 import io.reactivex.Flowable
