@@ -4,8 +4,11 @@ package msa.client.androidx_dagger2_mvvm_rx3.authentication.fm
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_authenticator.*
 import msa.client.androidx_dagger2_mvvm_rx3.R
 import msa.client.androidx_dagger2_mvvm_rx3.base.fm.Fm4LiveData
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.vm.AuthenticatorFmVm
@@ -23,6 +26,8 @@ import java.util.concurrent.TimeUnit
 // 총 4단계의 걸친 추상 상속 프래그먼트를 상속 받는 프래그 먼트
 // 다이어 로그 기능과 데거 인젝트가 가능하고 라이프 사이클 관리가 되고 4단계 라이프 데이터에서 막힘..
 // 프래그먼트 대 뷰모델을 제너릭으로 구현
+
+      //클레스    - > fm4 부모 (내가 사용할 VM 클래스를 넘겨줌 )
 class AuthenticatorFM : Fm4LiveData<AuthenticatorFmVm>() {
     override val layoutViewRes: Int = R.layout.fragment_authenticator
     override val viewModelClass: Class<AuthenticatorFmVm> = AuthenticatorFmVm::class.java
@@ -42,11 +47,11 @@ class AuthenticatorFM : Fm4LiveData<AuthenticatorFmVm>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*sign_in_email.setText(sharedPreferencesHelper.accountName.get())
+        //sign_in_email.setText(sharedPreferencesHelper.accountName.get())
 
         viewModel.signInVisibility.observe(this, Observer { sign_in_layout.isVisible = it })
         viewModel.signUpVisibility.observe(this, Observer { sign_up_layout.isVisible = it })
-
+        /*
         viewModel.addUserFlow(
             sign_in.clicks()
                 .map {

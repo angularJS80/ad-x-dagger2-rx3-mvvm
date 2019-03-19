@@ -1,5 +1,6 @@
 package msa.client.androidx_dagger2_mvvm_rx3.base.vm
 
+import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
@@ -19,7 +20,7 @@ import net.samystudio.beaver.ui.common.viewmodel.SingleLiveEvent
 */
 import javax.inject.Inject
 
-abstract class BaseViewControllerVm : Vm() {
+abstract class BaseViewControllerVm(application: Application) : Vm(application) {
     /*
     @Inject
     protected lateinit var userManager: UserManager

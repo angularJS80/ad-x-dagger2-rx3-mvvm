@@ -20,6 +20,7 @@ class MainActivity : At2Toolbar<MainActivityVm>() {
         // launch screen.
         setTheme(R.style.AppTheme)
 
+        
         super.onCreate(savedInstanceState)
     }
 

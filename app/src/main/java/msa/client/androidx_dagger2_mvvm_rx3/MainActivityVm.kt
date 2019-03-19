@@ -2,6 +2,7 @@ package msa.client.androidx_dagger2_mvvm_rx3
 
 import android.accounts.AccountAuthenticatorResponse
 import android.accounts.AccountManager
+import android.app.Application
 import android.content.Intent
 import msa.client.androidx_dagger2_mvvm_rx3.base.vm.VmForAt
 
@@ -12,8 +13,8 @@ import net.samystudio.beaver.ui.common.navigation.NavigationRequest
 */
 
 //@ActivityScope
-class MainActivityVm //@Inject constructor()
-    : VmForAt() {
+class MainActivityVm(application: Application) //@Inject constructor()
+    : VmForAt(application) {
     private var hasAuthenticatorResponse: Boolean = false
 
     override fun handleIntent(intent: Intent) {
