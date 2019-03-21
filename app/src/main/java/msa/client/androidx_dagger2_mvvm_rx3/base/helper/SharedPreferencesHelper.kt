@@ -1,7 +1,6 @@
 package msa.client.androidx_dagger2_mvvm_rx3.base.helper
 import com.f2prateek.rx.preferences2.RxSharedPreferences
-import javax.inject.Inject
-import javax.inject.Singleton
+
 
 //@Singleton
 class SharedPreferencesHelper //@Inject

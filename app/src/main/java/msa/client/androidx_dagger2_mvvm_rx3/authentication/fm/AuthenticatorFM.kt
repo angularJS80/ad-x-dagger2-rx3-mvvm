@@ -7,9 +7,13 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import com.jakewharton.rxbinding3.view.clicks
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_authenticator.*
 import msa.client.androidx_dagger2_mvvm_rx3.R
+import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignIn
+import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignUp
 import msa.client.androidx_dagger2_mvvm_rx3.base.fm.Fm4LiveData
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.vm.AuthenticatorFmVm
 /*
@@ -51,90 +55,98 @@ class AuthenticatorFM : Fm4LiveData<AuthenticatorFmVm>() {
 
         viewModel.signInVisibility.observe(this, Observer { sign_in_layout.isVisible = it })
         viewModel.signUpVisibility.observe(this, Observer { sign_up_layout.isVisible = it })
+
+        viewModel.singInClickSubscriber(signInClicksPublisher())
+        viewModel.signUpClickSubscriber(signUpClicksPublisher())
         /*
-        viewModel.addUserFlow(
-            sign_in.clicks()
-                .map {
-                    AuthenticatorUserFlow.SignIn(
-                        sign_in_email.text.toString(),
-                        sign_in_password.text.toString()
-                    )
-                })
-        viewModel.addUserFlow(
-            sign_up.clicks()
-                .map {
-                    AuthenticatorUserFlow.SignUp(
-                        sign_up_email.text.toString(),
-                        sign_up_password.text.toString()
-                    )
-                })
+               disposables = CompositeDisposable()
 
-        disposables = CompositeDisposable()
+               disposables?.add(
+                   Observables
+                       .combineLatest(
+                           sign_in_email.textChanges()
+                               .debounce(500, TimeUnit.MILLISECONDS)
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .map { t ->
+                                   val emailValid = emailValidator.validate(t)
+                                   sign_in_email_layout.error =
+                                           if (!t.isEmpty() && !emailValid) "Invalid email" else null
+                                   emailValid
+                               },
+                           sign_in_password.textChanges()
+                               .debounce(500, TimeUnit.MILLISECONDS)
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .map { t ->
+                                   val passwordValid = passwordValidator.validate(t)
+                                   sign_in_password_layout.error =
+                                           if (!t.isEmpty() && !passwordValid) "Invalid password (minimum 8 chars)" else null
+                                   passwordValid
+                               }
+                       ) { t1, t2 -> t1 && t2 }
+                       .observeOn(AndroidSchedulers.mainThread())
+                       .startWith(false)
+                       .subscribe { sign_in.isEnabled = it })
 
-        disposables?.add(
-            Observables
-                .combineLatest(
-                    sign_in_email.textChanges()
-                        .debounce(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map { t ->
-                            val emailValid = emailValidator.validate(t)
-                            sign_in_email_layout.error =
-                                    if (!t.isEmpty() && !emailValid) "Invalid email" else null
-                            emailValid
-                        },
-                    sign_in_password.textChanges()
-                        .debounce(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map { t ->
-                            val passwordValid = passwordValidator.validate(t)
-                            sign_in_password_layout.error =
-                                    if (!t.isEmpty() && !passwordValid) "Invalid password (minimum 8 chars)" else null
-                            passwordValid
-                        }
-                ) { t1, t2 -> t1 && t2 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .startWith(false)
-                .subscribe { sign_in.isEnabled = it })
-
-        disposables?.add(
-            Observables
-                .combineLatest(
-                    sign_up_email.textChanges()
-                        .debounce(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map { t ->
-                            val emailValid = emailValidator.validate(t)
-                            sign_up_email_layout.error =
-                                    if (!t.isEmpty() && !emailValid) "Invalid email" else null
-                            emailValid
-                        },
-                    sign_up_password.textChanges()
-                        .debounce(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map { t ->
-                            val passwordValid = passwordValidator.validate(t)
-                            sign_up_password_layout.error =
-                                    if (!t.isEmpty() && !passwordValid) "Invalid password (minimum 8 chars)" else null
-                            passwordValid
-                        },
-                    sign_up_confirm_password.textChanges()
-                        .debounce(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map { t ->
-                            val password = sign_up_password.text.toString()
-                            val passwordMatchValid = t.toString() == password
-                            sign_up_confirm_password_layout.error =
-                                    if (passwordValidator.validate(password) && !passwordMatchValid) "Passwords don't match" else null
-                            passwordMatchValid
-                        }
-                ) { t1, t2, t3 -> t1 && t2 && t3 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .startWith(false)
-                .subscribe { sign_up.isEnabled = it })*/
+               disposables?.add(
+                   Observables
+                       .combineLatest(
+                           sign_up_email.textChanges()
+                               .debounce(500, TimeUnit.MILLISECONDS)
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .map { t ->
+                                   val emailValid = emailValidator.validate(t)
+                                   sign_up_email_layout.error =
+                                           if (!t.isEmpty() && !emailValid) "Invalid email" else null
+                                   emailValid
+                               },
+                           sign_up_password.textChanges()
+                               .debounce(500, TimeUnit.MILLISECONDS)
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .map { t ->
+                                   val passwordValid = passwordValidator.validate(t)
+                                   sign_up_password_layout.error =
+                                           if (!t.isEmpty() && !passwordValid) "Invalid password (minimum 8 chars)" else null
+                                   passwordValid
+                               },
+                           sign_up_confirm_password.textChanges()
+                               .debounce(500, TimeUnit.MILLISECONDS)
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .map { t ->
+                                   val password = sign_up_password.text.toString()
+                                   val passwordMatchValid = t.toString() == password
+                                   sign_up_confirm_password_layout.error =
+                                           if (passwordValidator.validate(password) && !passwordMatchValid) "Passwords don't match" else null
+                                   passwordMatchValid
+                               }
+                       ) { t1, t2, t3 -> t1 && t2 && t3 }
+                       .observeOn(AndroidSchedulers.mainThread())
+                       .startWith(false)
+                       .subscribe { sign_up.isEnabled = it })*/
     }
 
-    override fun dataPushStart() {
+          // 버튼 클릭 이벤트 발생기
+          private fun signUpClicksPublisher(): Observable<MemberSignUp> {
+              return sign_up.clicks()
+                  .map {
+                      MemberSignUp(
+                          sign_up_email.text.toString(),
+                          sign_up_password.text.toString()
+                      )
+                  }
+          }
+
+          // 버튼 클릭 이벤트 발생기
+          private fun signInClicksPublisher(): Observable<MemberSignIn> {
+              return sign_in.clicks()
+                  .map {
+                      MemberSignIn(
+                          sign_in_email.text.toString(),
+                          sign_in_password.text.toString()
+                      )
+                  }
+          }
+
+          override fun dataPushStart() {
         // TODO show loader
     }
 

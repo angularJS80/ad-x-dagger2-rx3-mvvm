@@ -7,22 +7,26 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
-import msa.client.androidx_dagger2_mvvm_rx3.authentication.AuthenticatorUserFlow
+import io.reactivex.schedulers.Schedulers
+import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignIn
+import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignUp
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.repo.AuthenticatorRepositoryManager
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.repo.UserManager
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.webapi.AuthenticatorApiInterface
+import msa.client.androidx_dagger2_mvvm_rx3.base.cm.navi.NavigationRequest
 import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncStateLiveData
 import msa.client.androidx_dagger2_mvvm_rx3.base.vm.VmForFm
 import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncState
 import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncStateLiveDataDefine
-import msa.client.androidx_dagger2_mvvm_rx3.base.ext.getClassTag
 import msa.client.androidx_dagger2_mvvm_rx3.base.helper.SharedPreferencesHelper
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Retrofit
@@ -56,16 +60,22 @@ class AuthenticatorFmVm(application: Application)// @Inject
     private val sharedPreferencesHelper: SharedPreferencesHelper= SharedPreferencesHelper(rxSharedPreferences)
 
     private val  userManager:UserManager = UserManager(accountManager,sharedPreferencesHelper)
+        private val interceptor:HttpLoggingInterceptor = HttpLoggingInterceptor()
+
+        private val client:OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build();
 
 
 // 레토르핏 통해서 구현체 가져와야...
-    private   val retrofit = Retrofit.Builder()
-            .baseUrl("http://localhost")
-            //.client(client)
+
+     private   val retrofit = Retrofit.Builder()
+            .baseUrl("")
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
-     private val authenticatorApiInterface: AuthenticatorApiInterface = retrofit.create(AuthenticatorApiInterface::class.java!!)
+
+
+        private val authenticatorApiInterface: AuthenticatorApiInterface = retrofit.create(AuthenticatorApiInterface::class.java!!)
 
 
     private val authenticatorRepositoryManager: AuthenticatorRepositoryManager = AuthenticatorRepositoryManager(userManager,authenticatorApiInterface)
@@ -91,54 +101,62 @@ class AuthenticatorFmVm(application: Application)// @Inject
         //_signUpVisibility.value = !intent.hasExtra(UserManager.KEY_CONFIRM_ACCOUNT)
     }
 
-    fun <T : AuthenticatorUserFlow> addUserFlow(observable: Observable<T>) {
+    //버튼 클릭 이벤트 청취기
+    fun <T : MemberSignIn> singInClickSubscriber(observable: Observable<T>) {
         addDisposable(
 
-            observable.flatMap { userFlow ->
-            when (userFlow) {
+            observable //버튼 클릭이벤트 발생
+            .flatMap {
+                    memberSign -> // 발생된 맴버 정보를 꺼내서
 
-
-                is AuthenticatorUserFlow.SignIn ->
-                    _asyncStateLiveData.bind(
-                        authenticatorRepositoryManager.signIn(userFlow.email, userFlow.password)
-                    ).observeOn(AndroidSchedulers.mainThread())
+                        _asyncStateLiveData.bind(// 처리 결과를 청취 하고 결과 발생시 postValue 수행 클랙한 수만큼 청취 가능한 바인딩이 발생
+                            authenticatorRepositoryManager.signIn(memberSign) // api 호출등의 처리 결과를 구독가능한 형태로 리턴
+                        )
+                        .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext {
-                            if (it is AsyncState.Completed) handleSignResult(
-                                userFlow.email,
-                                userFlow.password
-                            )
+                            if (it is AsyncState.Completed) handleSignInResult(memberSign) // 전역변수의 넥스트 값을 받아서 리절트 핸들링 왜이렇게 만들었는지...
                         }
-                is AuthenticatorUserFlow.SignUp ->
-                    _asyncStateLiveData.bind(
-                        authenticatorRepositoryManager.signUp(userFlow.email, userFlow.password)
-                    ).observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext {
-                            if (it is AsyncState.Completed) handleSignResult(
-                                userFlow.email,
-                                userFlow.password
-                            )
-                        }.zipWith(Observable.just(""), BiFunction { t1, _ -> t1 })
-                else -> Observable.error<AsyncState> {
-                    IllegalArgumentException("Unknown user flow ${userFlow.getClassTag()}.")
-                }
-
-
             }
-        }.subscribe())
+            .subscribe()
+        )
     }
 
-    private fun handleSignResult(email: String, password: String) {
-        /*authenticatorResponse?.onResult(
+    private fun  handleSignInResult(memberSignIn: MemberSignIn) {
+        authenticatorResponse?.onResult(
             bundleOf(
-                AccountManager.KEY_ACCOUNT_NAME to email,
+                AccountManager.KEY_ACCOUNT_NAME to memberSignIn.email,
                 AccountManager.KEY_ACCOUNT_TYPE to UserManager.ACCOUNT_TYPE,
-                AccountManager.KEY_PASSWORD to password
+                AccountManager.KEY_PASSWORD to memberSignIn.password
             )
         )
-
         authenticatorResponse = null
-        navigate(NavigationRequest.Pop())*/
+        navigate(NavigationRequest.Pop())
     }
+    //버튼 클릭 이벤트 청취기
+    fun <T : MemberSignUp> signUpClickSubscriber(observable: Observable<T>) {
+        addDisposable(
+            observable.flatMap { memberSignUp ->
+                        _asyncStateLiveData.bind(
+                            authenticatorRepositoryManager.signUp(memberSignUp)
+                        ).observeOn(AndroidSchedulers.mainThread())
+                            .doOnNext {
+                                if (it is AsyncState.Completed) handleSignUpResult(memberSignUp)
+                            }//.zipWith(Observable.just(""), BiFunction { t1, _ -> t1 })
+
+            }.subscribe()
+        )
+    }
+        private fun  handleSignUpResult(memberSignUp: MemberSignUp) {
+            authenticatorResponse?.onResult(
+                bundleOf(
+                    AccountManager.KEY_ACCOUNT_NAME to memberSignUp.email,
+                    AccountManager.KEY_ACCOUNT_TYPE to UserManager.ACCOUNT_TYPE,
+                    AccountManager.KEY_PASSWORD to memberSignUp.password
+                )
+            )
+            authenticatorResponse = null
+            navigate(NavigationRequest.Pop())
+        }
 
     /*override fun onCleared() {
         super.onCleared()

@@ -9,13 +9,12 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import msa.client.androidx_dagger2_mvvm_rx3.BuildConfig
 import msa.client.androidx_dagger2_mvvm_rx3.base.helper.SharedPreferencesHelper
-import javax.inject.Inject
-import javax.inject.Singleton
+
 
 /**
  * @see [net.samystudio.beaver.di.module.SystemServiceModule.provideAccountManager]
  */
-@Singleton
+//@Singleton
 class UserManager
 //@Inject
 constructor(

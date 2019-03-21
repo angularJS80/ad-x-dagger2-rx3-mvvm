@@ -1,41 +1,51 @@
 package msa.client.androidx_dagger2_mvvm_rx3.authentication.repo
 
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignIn
+import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignUp
 import msa.client.androidx_dagger2_mvvm_rx3.base.data.AsyncState
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.webapi.AuthenticatorApiInterface
-import javax.inject.Inject
-import javax.inject.Singleton
+
 
 /**
  * @see [net.samystudio.beaver.di.module.NetworkModule.provideAuthenticatorApiInterface]
  */
-@Singleton
+//@Singleton
 class AuthenticatorRepositoryManager
 //@Inject
 constructor(
     private val userManager: UserManager,
     private val authenticatorApiInterface: AuthenticatorApiInterface
 ) {
-    fun signIn(email: String, password: String): Observable<AsyncState> =
+    fun signIn(memberSignIn: MemberSignIn): Observable<AsyncState> =
         authenticatorApiInterface
-            .signIn(email, password)
+            .signIn(memberSignIn.email, memberSignIn.password)
             .toObservable()
-            .onErrorReturnItem("token") // TODO remove this line, for debug only
+            //.onErrorReturnItem("token") // TODO remove this line, for debug only
             .map {
-                userManager.connect(email, password, it)
+                println(it);
+                //userManager.connect(memberSignIn.email, memberSignIn.password, it)
                 AsyncState.Completed
             }
             .cast(AsyncState::class.java)
-            .onErrorReturn { AsyncState.Failed(it) }
+            //.observeOn(Schedulers.newThread())
+            .subscribeOn(Schedulers.newThread())
+            .onErrorReturn {
+                it.printStackTrace()
+                AsyncState.Failed(it)
+
+            }
             .startWith(AsyncState.Started)
 
-    fun signUp(email: String, password: String): Observable<AsyncState> =
+    fun signUp(memberSignUp: MemberSignUp): Observable<AsyncState> =
         authenticatorApiInterface
-            .signUp(email, password)
+            .signUp(memberSignUp.email, memberSignUp.password)
             .toObservable()
             .onErrorReturnItem("token") // TODO remove this line, for debug only
             .map {
-                userManager.createAccount(email, password)
+                userManager.createAccount(memberSignUp.email, memberSignUp.password)
                 AsyncState.Completed
             }
             .cast(AsyncState::class.java)

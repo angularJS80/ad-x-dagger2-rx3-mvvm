@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.evernote.android.state.State
-import com.google.firebase.analytics.FirebaseAnalytics
+//import com.google.firebase.analytics.FirebaseAnalytics
 import io.reactivex.disposables.CompositeDisposable
 import msa.client.androidx_dagger2_mvvm_rx3.base.ext.getClassTag
 import net.samystudio.beaver.ui.base.activity.At1LifeCycle
@@ -41,7 +41,7 @@ abstract class Fm1Dialog : AppCompatDialogFragment(), DialogInterface.OnShowList
     @get:LayoutRes
     protected abstract val layoutViewRes: Int
     protected val navController: NavController by lazy { findNavController() }
-    protected open lateinit var firebaseAnalytics: FirebaseAnalytics
+    //protected open lateinit var firebaseAnalytics: FirebaseAnalytics
     @State
     protected var resultCode: Int = Activity.RESULT_CANCELED
     @State
@@ -90,8 +90,8 @@ abstract class Fm1Dialog : AppCompatDialogFragment(), DialogInterface.OnShowList
         // In most case we'll extends BaseDataFragment and get these initialized with injection, but
         // if we want really simple fragment screen with no data (less boilerplate), we have to
         // initialize these manually.
-        if (!::firebaseAnalytics.isInitialized)
-            context?.let { firebaseAnalytics = FirebaseAnalytics.getInstance(it) }
+        /*if (!::firebaseAnalytics.isInitialized)
+            context?.let { firebaseAnalytics = FirebaseAnalytics.getInstance(it) }*/
 
         if (showsDialog) dialog.setOnShowListener(this)
 
@@ -113,11 +113,11 @@ abstract class Fm1Dialog : AppCompatDialogFragment(), DialogInterface.OnShowList
         pauseDisposable = CompositeDisposable()
 
         if (!restoringState) {
-            firebaseAnalytics.setCurrentScreen(
+            /*firebaseAnalytics.setCurrentScreen(
                 activity!!,
                 getClassTag(),
                 getClassTag()
-            )
+            )*/
             restoringState = false
         }
 

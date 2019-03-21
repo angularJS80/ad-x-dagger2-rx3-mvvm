@@ -12,10 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.disposables.CompositeDisposable
 import msa.client.androidx_dagger2_mvvm_rx3.base.fm.Fm4LiveData
 import msa.client.androidx_dagger2_mvvm_rx3.base.vm.VmForAt
@@ -27,7 +23,6 @@ import net.samystudio.beaver.ext.navigate
 import net.samystudio.beaver.ui.base.fragment.BaseViewModelFragment
 import net.samystudio.beaver.ui.base.viewmodel.BaseActivityViewModel
 */
-import javax.inject.Inject
 
 abstract class At1LifeCycle<VM : VmForAt> : AppCompatActivity()
     //,HasSupportFragmentInjector

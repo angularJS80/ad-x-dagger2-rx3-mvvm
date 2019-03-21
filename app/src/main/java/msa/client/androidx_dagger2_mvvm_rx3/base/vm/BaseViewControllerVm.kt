@@ -18,7 +18,6 @@ import net.samystudio.beaver.ui.common.navigation.NavigationRequest
 import net.samystudio.beaver.ui.common.viewmodel.NavigationEvent
 import net.samystudio.beaver.ui.common.viewmodel.SingleLiveEvent
 */
-import javax.inject.Inject
 
 abstract class BaseViewControllerVm(application: Application) : Vm(application) {
     /*

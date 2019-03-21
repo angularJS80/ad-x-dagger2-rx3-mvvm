@@ -2,11 +2,6 @@ package msa.client.androidx_dagger2_mvvm_rx3.base.fm
 
 import android.content.Context
 import androidx.fragment.app.Fragment
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.AndroidSupportInjection
-import dagger.android.support.HasSupportFragmentInjector
-import javax.inject.Inject
 
 
 // 앞서 정의한 기본 프레그먼트를 상속받고
