@@ -1,7 +1,9 @@
 package msa.client.androidx_dagger2_mvvm_rx3.authentication.repo
 
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignIn
 import msa.client.androidx_dagger2_mvvm_rx3.authentication.entity.MemberSignUp
@@ -19,8 +21,18 @@ constructor(
     private val userManager: UserManager,
     private val authenticatorApiInterface: AuthenticatorApiInterface
 ) {
-    fun signIn(memberSignIn: MemberSignIn): Observable<AsyncState> =
+    fun signIn(memberSignIn: MemberSignIn): Observable<AsyncState> {
         authenticatorApiInterface
+            .postLogin(memberSignIn)
+            .subscribeOn(Schedulers.newThread())
+            .onErrorReturn {  }
+
+            .onErrorReturn {
+
+
+            }.subscribe(postLoginObserver())
+
+        return authenticatorApiInterface
             .signIn(memberSignIn.email, memberSignIn.password)
             .toObservable()
             //.onErrorReturnItem("token") // TODO remove this line, for debug only
@@ -38,6 +50,26 @@ constructor(
 
             }
             .startWith(AsyncState.Started)
+    }
+
+    fun postLoginObserver(): DisposableObserver<Any> {
+        return object : DisposableObserver<Any>() {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onNext(t: Any) {
+                println(t)
+            }
+
+            override fun onError(e: Throwable) {
+                println(e)
+            }
+
+
+        }
+    }
+
 
     fun signUp(memberSignUp: MemberSignUp): Observable<AsyncState> =
         authenticatorApiInterface

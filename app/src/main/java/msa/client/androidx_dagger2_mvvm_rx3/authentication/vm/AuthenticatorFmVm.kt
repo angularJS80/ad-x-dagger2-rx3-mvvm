@@ -60,25 +60,31 @@ class AuthenticatorFmVm(application: Application)// @Inject
     private val sharedPreferencesHelper: SharedPreferencesHelper= SharedPreferencesHelper(rxSharedPreferences)
 
     private val  userManager:UserManager = UserManager(accountManager,sharedPreferencesHelper)
-        private val interceptor:HttpLoggingInterceptor = HttpLoggingInterceptor()
 
-        private val client:OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build();
-
+    private val authenticatorRepositoryManager: AuthenticatorRepositoryManager = getAuthenticatorRepositoryManager()
 
 // 레토르핏 통해서 구현체 가져와야...
 
-     private   val retrofit = Retrofit.Builder()
+    private fun getAuthenticatorRepositoryManager(): AuthenticatorRepositoryManager {
+        val httpLoggingInterceptor : HttpLoggingInterceptor = HttpLoggingInterceptor()
+
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+
+        val client:OkHttpClient = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build();
+        val retrofit = Retrofit.Builder()
             .baseUrl("")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
 
+        val authenticatorApiInterface: AuthenticatorApiInterface = retrofit.create(AuthenticatorApiInterface::class.java!!)
 
-        private val authenticatorApiInterface: AuthenticatorApiInterface = retrofit.create(AuthenticatorApiInterface::class.java!!)
+        return AuthenticatorRepositoryManager(userManager,authenticatorApiInterface)
+    }
 
 
-    private val authenticatorRepositoryManager: AuthenticatorRepositoryManager = AuthenticatorRepositoryManager(userManager,authenticatorApiInterface)
     private val _asyncStateLiveData: AsyncStateLiveData = AsyncStateLiveData()
     override val liveData: LiveData<AsyncState> =
         AsyncStateLiveData()//_asyncStateLiveData

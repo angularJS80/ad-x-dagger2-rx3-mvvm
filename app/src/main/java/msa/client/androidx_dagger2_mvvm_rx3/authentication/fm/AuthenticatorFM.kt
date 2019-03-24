@@ -141,7 +141,8 @@ class AuthenticatorFM : Fm4LiveData<AuthenticatorFmVm>() {
                   .map {
                       MemberSignIn(
                           sign_in_email.text.toString(),
-                          sign_in_password.text.toString()
+                          sign_in_password.text.toString(),
+                          sign_in_email.text.toString()
                       )
                   }
           }
